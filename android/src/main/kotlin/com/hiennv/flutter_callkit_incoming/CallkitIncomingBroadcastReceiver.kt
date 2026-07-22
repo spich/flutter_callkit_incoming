@@ -180,17 +180,16 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                 try {
                     registerTelecomIncomingCall(context, data)
                     val incomingData = Data.fromBundle(data)
-                    if (incomingData.isFullScreen) {
-                        val intent = CallkitIncomingActivity.getIntent(context, data)
-                        context.startActivity(intent)
-                        // MojiApp fix: fullscreen grana preskače showIncomingNotification,
-                        // a samo on zove play() — bez ovoga fullscreen poziv NE zvoni.
-                        FlutterCallkitIncomingPlugin.getInstance()?.getCallkitSoundPlayerManager()?.play(data)
-                    } else {
-                        getCallkitNotificationManager()?.showIncomingNotification(data)
-                        sendEventFlutter(CallkitConstants.ACTION_CALL_INCOMING, data)
-                        addCall(context, incomingData)
-                    }
+                    // MOJIAPP FORK: uvijek notifikacijski put — jedini ima
+                    // kompletnu mašineriju (ringtone+vibra, addCall pa endCall/
+                    // decline stvarno gase, setTimeoutAfter auto-missed,
+                    // fullScreenIntent otvara activity na zaključanom ekranu).
+                    // Upstream startActivity grana za isFullScreen nije imala
+                    // ništa od toga: bez zvuka, bez timeouta, i cancel je nije
+                    // mogao ugasiti (beskonačna zvonjava).
+                    getCallkitNotificationManager()?.showIncomingNotification(data)
+                    sendEventFlutter(CallkitConstants.ACTION_CALL_INCOMING, data)
+                    addCall(context, incomingData)
                 } catch (error: Exception) {
                     Log.e(TAG, null, error)
                 }
