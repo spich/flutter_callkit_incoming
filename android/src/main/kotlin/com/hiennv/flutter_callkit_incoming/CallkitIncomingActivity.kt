@@ -58,6 +58,10 @@ class CallkitIncomingActivity : Activity() {
 
         fun getIntentEnded(context: Context, isAccepted: Boolean): Intent {
             val intent = Intent("${context.packageName}.${ACTION_ENDED_CALL_INCOMING}")
+            // MOJIAPP FORK: bez foreground queue-a Android cached procesu
+            // dostavi broadcast s ~10s odgode → plavi ekran ostane visjeti
+            // nakon što pozivatelj prekine (zvuk stane, ekran ne).
+            intent.addFlags(Intent.FLAG_RECEIVER_FOREGROUND)
             intent.putExtra("ACCEPTED", isAccepted)
             intent.setPackage(context.packageName)
             intent.setClassName(
