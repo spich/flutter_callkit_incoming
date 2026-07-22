@@ -183,6 +183,9 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                     if (incomingData.isFullScreen) {
                         val intent = CallkitIncomingActivity.getIntent(context, data)
                         context.startActivity(intent)
+                        // MojiApp fix: fullscreen grana preskače showIncomingNotification,
+                        // a samo on zove play() — bez ovoga fullscreen poziv NE zvoni.
+                        FlutterCallkitIncomingPlugin.getInstance()?.getCallkitSoundPlayerManager()?.play(data)
                     } else {
                         getCallkitNotificationManager()?.showIncomingNotification(data)
                         sendEventFlutter(CallkitConstants.ACTION_CALL_INCOMING, data)
