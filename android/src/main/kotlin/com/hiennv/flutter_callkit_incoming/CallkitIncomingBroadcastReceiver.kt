@@ -180,16 +180,22 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                 try {
                     registerTelecomIncomingCall(context, data)
                     val incomingData = Data.fromBundle(data)
-                    // MOJIAPP FORK: uvijek notifikacijski put — jedini ima
-                    // kompletnu mašineriju (ringtone+vibra, addCall pa endCall/
-                    // decline stvarno gase, setTimeoutAfter auto-missed,
-                    // fullScreenIntent otvara activity na zaključanom ekranu).
-                    // Upstream startActivity grana za isFullScreen nije imala
-                    // ništa od toga: bez zvuka, bez timeouta, i cancel je nije
-                    // mogao ugasiti (beskonačna zvonjava).
-                    getCallkitNotificationManager()?.showIncomingNotification(data)
-                    sendEventFlutter(CallkitConstants.ACTION_CALL_INCOMING, data)
-                    addCall(context, incomingData)
+                    if (incomingData.isFullScreen) {
+                        val intent = CallkitIncomingActivity.getIntent(context, data)
+                        context.startActivity(intent)
+                        // MOJIAPP FORK (minimalno): upstream fullscreen grana
+                        // ne pokreće zvuk (play() zove samo notifikacijska
+                        // grana) i ne registrira poziv — pa ga endCall/decline
+                        // ne nađu u activeCalls i cancel NIŠTA ne ugasi
+                        // (beskonačna zvonjava). Ostalo identično upstreamu.
+                        FlutterCallkitIncomingPlugin.getInstance()?.getCallkitSoundPlayerManager()?.play(data)
+                        sendEventFlutter(CallkitConstants.ACTION_CALL_INCOMING, data)
+                        addCall(context, incomingData)
+                    } else {
+                        getCallkitNotificationManager()?.showIncomingNotification(data)
+                        sendEventFlutter(CallkitConstants.ACTION_CALL_INCOMING, data)
+                        addCall(context, incomingData)
+                    }
                 } catch (error: Exception) {
                     Log.e(TAG, null, error)
                 }
