@@ -92,6 +92,19 @@ class CallkitSoundPlayerManager(private val context: Context) {
         vibrator?.cancel()
     }
 
+    // MOJIAPP FORK: DND (Ne ometaj / mod Spavanje) mutira app-playani
+    // ringtone (per-uid opPlayAudio mute) bez obzira na bypassDnd kanal.
+    // Pozivi moraju zvoniti kao pravi telefon → pod DND-om zvuk/vibra idu
+    // s ALARM atributima (alarmi prolaze kroz Spavanje). Igor 2026-07-23.
+    private fun isDndActive(): Boolean {
+        return try {
+            val nm = context.getSystemService(Context.NOTIFICATION_SERVICE)
+                    as android.app.NotificationManager
+            nm.currentInterruptionFilter !=
+                android.app.NotificationManager.INTERRUPTION_FILTER_ALL
+        } catch (_: Exception) { false }
+    }
+
     private fun playVibrator() {
         vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             val vibratorManager =
@@ -106,10 +119,13 @@ class CallkitSoundPlayerManager(private val context: Context) {
         val pattern = longArrayOf(0L, 1000L, 1000L)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            val dnd = isDndActive()
             val audioAttrs = AudioAttributes.Builder()
                 .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
-                .setLegacyStreamType(AudioManager.STREAM_RING)
+                .setUsage(if (dnd) AudioAttributes.USAGE_ALARM
+                          else AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
+                .setLegacyStreamType(if (dnd) AudioManager.STREAM_ALARM
+                                     else AudioManager.STREAM_RING)
                 .build()
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -139,15 +155,19 @@ class CallkitSoundPlayerManager(private val context: Context) {
         }
         try {
             ringtone = RingtoneManager.getRingtone(context, uri)
+            val dnd = isDndActive()
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 val attribution = AudioAttributes.Builder()
                     .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                    .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
-                    .setLegacyStreamType(AudioManager.STREAM_RING)
+                    .setUsage(if (dnd) AudioAttributes.USAGE_ALARM
+                              else AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
+                    .setLegacyStreamType(if (dnd) AudioManager.STREAM_ALARM
+                                         else AudioManager.STREAM_RING)
                     .build()
                 ringtone?.setAudioAttributes(attribution)
             } else {
-                ringtone?.streamType = AudioManager.STREAM_RING
+                ringtone?.streamType =
+                    if (dnd) AudioManager.STREAM_ALARM else AudioManager.STREAM_RING
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                 ringtone?.isLooping = true

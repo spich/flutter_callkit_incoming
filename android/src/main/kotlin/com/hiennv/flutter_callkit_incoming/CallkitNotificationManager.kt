@@ -49,8 +49,12 @@ class CallkitNotificationManager(
 
         const val EXTRA_TIME_START_CALL = "EXTRA_TIME_START_CALL"
 
-        const val NOTIFICATION_CHANNEL_ID_INCOMING = "callkit_incoming_channel_id_v2"
+        // MOJIAPP FORK: v3 = bypassDnd kanal (poziv zvoni kroz Ne ometaj /
+        // mod Spavanje). Novi id jer Android ne dopušta izmjenu bypassDnd
+        // na postojećem kanalu.
+        const val NOTIFICATION_CHANNEL_ID_INCOMING = "callkit_incoming_channel_id_v3"
         private const val LEGACY_NOTIFICATION_CHANNEL_ID_INCOMING = "callkit_incoming_channel_id"
+        private const val LEGACY_NOTIFICATION_CHANNEL_ID_INCOMING_V2 = "callkit_incoming_channel_id_v2"
         const val NOTIFICATION_CHANNEL_ID_ONGOING = "callkit_ongoing_channel_id"
         const val NOTIFICATION_CHANNEL_ID_MISSED = "callkit_missed_channel_id"
 
@@ -914,6 +918,13 @@ class CallkitNotificationManager(
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             getNotificationManager().apply {
+                // MOJIAPP FORK: počisti stare incoming kanale (v1/v2 bez
+                // bypassDnd) da korisniku u postavkama ne vise duplikati.
+                try {
+                    deleteNotificationChannel(LEGACY_NOTIFICATION_CHANNEL_ID_INCOMING)
+                    deleteNotificationChannel(LEGACY_NOTIFICATION_CHANNEL_ID_INCOMING_V2)
+                } catch (_: Exception) {}
+
                 var channelCall = getNotificationChannel(NOTIFICATION_CHANNEL_ID_INCOMING)
                 if (channelCall != null) {
                     channelCall.setSound(null, null)
@@ -929,6 +940,10 @@ class CallkitNotificationManager(
                         enableLights(true)
                         enableVibration(true)
                         setSound(null, null)
+                        // MOJIAPP FORK: dolazni POZIV zvoni i kroz Ne ometaj /
+                        // mod Spavanje — kao pravi telefon (Igor 2026-07-23).
+                        // Vrijedi samo pri KREIRANJU kanala.
+                        setBypassDnd(true)
                     }
                 }
                 channelCall.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
