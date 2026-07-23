@@ -196,6 +196,22 @@ class CallkitIncomingActivity : Activity() {
         val data = intent.extras?.getBundle(CallkitConstants.EXTRA_CALLKIT_INCOMING_DATA)
         if (data == null) finish()
 
+        // MOJIAPP FORK: fullScreenIntent zna opaliti ZAKAŠNJELO (npr. tek na
+        // unlock, nakon DND/Doze odgode) za poziv koji je odavno završio —
+        // ended broadcast je tada već prošao i nema tko zatvoriti ekran.
+        // Ako poziv više nije aktivan (endCall/decline ga je maknuo iz
+        // activeCalls), odmah se ugasi (Igor 2026-07-23).
+        val callId = data?.getString(CallkitConstants.EXTRA_CALLKIT_ID, "")
+        if (!callId.isNullOrEmpty()) {
+            val stillActive = try {
+                getDataActiveCalls(this).any { it.id == callId && !it.isAccepted }
+            } catch (_: Exception) { true }
+            if (!stillActive) {
+                finish()
+                return
+            }
+        }
+
         val isShowFullLockedScreen =
             data?.getBoolean(CallkitConstants.EXTRA_CALLKIT_IS_SHOW_FULL_LOCKED_SCREEN, true)
         if (isShowFullLockedScreen == true) {
