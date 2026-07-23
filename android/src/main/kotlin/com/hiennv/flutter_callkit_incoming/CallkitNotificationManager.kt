@@ -928,6 +928,10 @@ class CallkitNotificationManager(
                 var channelCall = getNotificationChannel(NOTIFICATION_CHANNEL_ID_INCOMING)
                 if (channelCall != null) {
                     channelCall.setSound(null, null)
+                    // MOJIAPP FORK: bypass i na POSTOJEĆEM kanalu — Android to
+                    // poštuje tek kad app ima "Ne ometaj pristup" (policy
+                    // access); bez njega je no-op, pa je sigurno zvati uvijek.
+                    if (!channelCall.canBypassDnd()) channelCall.setBypassDnd(true)
                 } else {
                     channelCall = NotificationChannel(
                         NOTIFICATION_CHANNEL_ID_INCOMING,
