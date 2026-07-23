@@ -1051,6 +1051,25 @@ class CallkitNotificationManager(
     @SuppressLint("MissingPermission")
     fun showIncomingNotification(data: Bundle) {
         val callkitNotification = getIncomingNotification(data)
+
+        // MOJIAPP FORK: Samsung mod Spavanje (DND) potiskuje fullScreenIntent
+        // kroz zen policy suppressedVisualEffects (bit 4) ČAK I uz bypassDnd
+        // kanal — poziv zvoni, ekran mrtav, a odgođeni FSI opali tek na
+        // unlock. Fallback: sami probudimo ekran wake-lockom pa je poziv
+        // odmah vidljiv na lockscreenu (Igor 2026-07-23).
+        try {
+            val pm = context.getSystemService(Context.POWER_SERVICE) as android.os.PowerManager
+            if (!pm.isInteractive) {
+                @Suppress("DEPRECATION")
+                val wl = pm.newWakeLock(
+                    android.os.PowerManager.SCREEN_BRIGHT_WAKE_LOCK
+                        or android.os.PowerManager.ACQUIRE_CAUSES_WAKEUP,
+                    "Callkit:IncomingWake"
+                )
+                wl.acquire(10_000L)
+            }
+        } catch (_: Exception) {}
+
         if (incomingChannelEnabled()) {
             callkitSoundPlayerManager?.play(data)
             // Start Signify modification

@@ -211,6 +211,14 @@ class CallkitIncomingActivity : Activity() {
                 return
             }
         }
+        // I VREMENSKA provjera: pod DND-om cancel FCM zna kasniti pa je
+        // mrtav poziv još "aktivan" u registru — zakašnjeli FSI stariji od
+        // ring prozora (60s) se svejedno ne prikazuje.
+        val startedAt = data?.getLong(CallkitNotificationManager.EXTRA_TIME_START_CALL, 0L) ?: 0L
+        if (startedAt > 0L && System.currentTimeMillis() - startedAt > 60_000L) {
+            finish()
+            return
+        }
 
         val isShowFullLockedScreen =
             data?.getBoolean(CallkitConstants.EXTRA_CALLKIT_IS_SHOW_FULL_LOCKED_SCREEN, true)
