@@ -341,12 +341,12 @@ class FlutterCallkitIncoming {
         final callUUIDToGroupWith = body?['callUUIDToGroupWith'] as String?;
         return CallEventActionCallToggleGroup(id, callUUIDToGroupWith);
       case CallEventConstants.actionCallToggleAudioSession:
+        // MOJIAPP FORK: iOS zna poslati event bez isActive u bodyju — throw
+        // je trovao onEvent stream uncaught errorom bas u trenutku javljanja
+        // (Igor 2026-08-13). Informativan event: bez podatka ga preskoci.
         final body = data['body'] as Map<Object?, Object?>?;
         final isActive = body?['isActive'] as bool?;
-        if (isActive == null) {
-          throw const FormatException(
-              '[ACTION_CALL_TOGGLE_AUDIO_SESSION] id is null.');
-        }
+        if (isActive == null) return null;
         return CallEventActionCallToggleAudioSession(isActive);
       case CallEventConstants.actionCallCustom:
         final body = data['body'] as Map<String, dynamic>?;
