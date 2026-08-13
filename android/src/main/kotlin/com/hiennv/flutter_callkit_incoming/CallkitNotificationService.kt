@@ -9,6 +9,7 @@ import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
+import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
 
 class CallkitNotificationService : Service() {
@@ -17,7 +18,8 @@ class CallkitNotificationService : Service() {
 
         private val ActionForeground = listOf(
             CallkitConstants.ACTION_CALL_START,
-            CallkitConstants.ACTION_CALL_ACCEPT
+            CallkitConstants.ACTION_CALL_ACCEPT,
+            CallkitConstants.ACTION_CALL_INCOMING
         )
 
 
@@ -28,7 +30,8 @@ class CallkitNotificationService : Service() {
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && intent.action in ActionForeground) {
                 data?.let {
-                    if(it.getBoolean(CallkitConstants.EXTRA_CALLKIT_CALLING_SHOW, true)) {
+                    if(action == CallkitConstants.ACTION_CALL_INCOMING ||
+                        it.getBoolean(CallkitConstants.EXTRA_CALLKIT_CALLING_SHOW, true)) {
                         ContextCompat.startForegroundService(context, intent)
                     }else {
                         context.startService(intent)
@@ -44,6 +47,25 @@ class CallkitNotificationService : Service() {
             context.stopService(intent)
         }
 
+        // MOJIAPP FORK: dolazno zvono na Androidu 14+ zivi kao FGS
+        // notifikacija; obican NotificationManager.cancel() je ne mice dok je
+        // servis foreground. Receiver, manager i servis su isti proces, pa
+        // manager gasi foreground stanje direktnim pozivom.
+        @Volatile
+        private var instance: CallkitNotificationService? = null
+
+        fun onIncomingCleared(isAccepted: Boolean) {
+            instance?.let {
+                if (it.foregroundIsIncoming) {
+                    ServiceCompat.stopForeground(it, ServiceCompat.STOP_FOREGROUND_REMOVE)
+                    it.foregroundIsIncoming = false
+                    // accept: isti servis odmah dize ongoing startForeground;
+                    // decline/timeout: servis vise nema razloga zivjeti
+                    if (!isAccepted) it.stopSelf()
+                }
+            }
+        }
+
     }
 
     // Get notification manager dynamically to handle plugin lifecycle properly
@@ -52,8 +74,11 @@ class CallkitNotificationService : Service() {
     }
 
 
+    private var foregroundIsIncoming = false
+
     override fun onCreate() {
         super.onCreate()
+        instance = this
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -75,6 +100,30 @@ class CallkitNotificationService : Service() {
                     if (it.getBoolean(CallkitConstants.EXTRA_CALLKIT_CALLING_SHOW, true)) {
                         showOngoingCallNotification(it)
                     }else {
+                        stopSelf()
+                    }
+                }
+        }
+        if (intent?.action == CallkitConstants.ACTION_CALL_INCOMING) {
+            intent.getBundleExtra(CallkitConstants.EXTRA_CALLKIT_INCOMING_DATA)
+                ?.let {
+                    val callkitNotification =
+                        getCallkitNotificationManager()?.getIncomingNotification(it)
+                    if (callkitNotification != null) {
+                        // Samo PHONE_CALL tip: dok zvoni mikrofon se jos ne
+                        // koristi, a MICROPHONE FGS tip iz pozadine Android 14
+                        // odbija (while-in-use ogranicenje).
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                            startForeground(
+                                callkitNotification.id,
+                                callkitNotification.notification,
+                                ServiceInfo.FOREGROUND_SERVICE_TYPE_PHONE_CALL
+                            )
+                        } else {
+                            startForeground(callkitNotification.id, callkitNotification.notification)
+                        }
+                        foregroundIsIncoming = true
+                    } else {
                         stopSelf()
                     }
                 }
@@ -114,6 +163,7 @@ class CallkitNotificationService : Service() {
 
 
     override fun onDestroy() {
+        instance = null
         super.onDestroy()
         // Don't destroy the notification manager here as it's shared across the app
         // The plugin will handle cleanup when all engines are detached

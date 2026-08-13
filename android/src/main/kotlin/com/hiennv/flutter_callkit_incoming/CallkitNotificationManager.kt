@@ -844,6 +844,9 @@ class CallkitNotificationManager(
     }
 
     fun clearIncomingNotification(data: Bundle, isAccepted: Boolean) {
+        // MOJIAPP FORK: ako dolazno zvono drzi FGS (Android 14+), prvo skini
+        // foreground stanje — cancel() ispod inace ne mice FGS notifikaciju.
+        CallkitNotificationService.onIncomingCleared(isAccepted)
         // Start Signify modification
         // Unregister volume key receiver
         volumeKeyReceiver?.let {
@@ -1050,7 +1053,18 @@ class CallkitNotificationManager(
 
     @SuppressLint("MissingPermission")
     fun showIncomingNotification(data: Bundle) {
-        val callkitNotification = getIncomingNotification(data)
+        // MOJIAPP FORK: Android 14+ odbija CallStyle notifikaciju koja ne
+        // dolazi iz FGS-a ili full-screen intenta. USE_FULL_SCREEN_INTENT je
+        // ugasen (Play odbio, odluka stoji), a foreground service je Play
+        // ODOBRIO (Igor, video appeal) — zato na 14+ zvono dize
+        // CallkitNotificationService.startForeground umjesto notify().
+        // Wake-lock i zvuk ostaju ovdje (vrijede za oba puta).
+        val useFgsForIncoming =
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE
+        if (useFgsForIncoming) {
+            createNotificationChanel(data)
+        }
+        val callkitNotification = if (useFgsForIncoming) null else getIncomingNotification(data)
 
         // MOJIAPP FORK: Samsung mod Spavanje (DND) potiskuje fullScreenIntent
         // kroz zen policy suppressedVisualEffects (bit 4) ČAK I uz bypassDnd
@@ -1079,6 +1093,12 @@ class CallkitNotificationManager(
                 IntentFilter("android.media.VOLUME_CHANGED_ACTION")
             )
             // End Signify modification
+        }
+        if (useFgsForIncoming) {
+            CallkitNotificationService.startServiceWithAction(
+                context, CallkitConstants.ACTION_CALL_INCOMING, data
+            )
+            return
         }
         callkitNotification?.let {
             getNotificationManager().notify(
