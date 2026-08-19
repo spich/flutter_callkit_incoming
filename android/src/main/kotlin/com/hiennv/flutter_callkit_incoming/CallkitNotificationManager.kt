@@ -49,8 +49,12 @@ class CallkitNotificationManager(
 
         const val EXTRA_TIME_START_CALL = "EXTRA_TIME_START_CALL"
 
-        const val NOTIFICATION_CHANNEL_ID_INCOMING = "callkit_incoming_channel_id_v2"
+        // MOJIAPP FORK: v3 = bypassDnd kanal (poziv zvoni kroz Ne ometaj /
+        // mod Spavanje). Novi id jer Android ne dopušta izmjenu bypassDnd
+        // na postojećem kanalu.
+        const val NOTIFICATION_CHANNEL_ID_INCOMING = "callkit_incoming_channel_id_v3"
         private const val LEGACY_NOTIFICATION_CHANNEL_ID_INCOMING = "callkit_incoming_channel_id"
+        private const val LEGACY_NOTIFICATION_CHANNEL_ID_INCOMING_V2 = "callkit_incoming_channel_id_v2"
         const val NOTIFICATION_CHANNEL_ID_ONGOING = "callkit_ongoing_channel_id"
         const val NOTIFICATION_CHANNEL_ID_MISSED = "callkit_missed_channel_id"
 
@@ -209,7 +213,10 @@ class CallkitNotificationManager(
         notificationBuilder?.setFullScreenIntent(
             getActivityPendingIntent(notificationId, data), true
         )
-        notificationBuilder?.setContentIntent(getActivityPendingIntent(notificationId, data))
+        // MOJIAPP FORK: tap na TIJELO notifikacije NE otvara full-screen
+        // incoming activity (Igor: javljanje ide gumbima; veliki plavi ekran
+        // samo na zaključanom ekranu kroz fullScreenIntent iznad).
+        // notificationBuilder?.setContentIntent(getActivityPendingIntent(notificationId, data))
         notificationBuilder?.setDeleteIntent(getTimeOutPendingIntent(notificationId, data))
         val typeCall = data.getInt(CallkitConstants.EXTRA_CALLKIT_TYPE, -1)
         var smallIcon = context.applicationInfo.icon
@@ -839,6 +846,9 @@ class CallkitNotificationManager(
     }
 
     fun clearIncomingNotification(data: Bundle, isAccepted: Boolean) {
+        // MOJIAPP FORK: ako dolazno zvono drzi FGS (Android 14+), prvo skini
+        // foreground stanje — cancel() ispod inace ne mice FGS notifikaciju.
+        CallkitNotificationService.onIncomingCleared(isAccepted)
         // Start Signify modification
         // Unregister volume key receiver
         volumeKeyReceiver?.let {
@@ -913,9 +923,20 @@ class CallkitNotificationManager(
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             getNotificationManager().apply {
+                // MOJIAPP FORK: počisti stare incoming kanale (v1/v2 bez
+                // bypassDnd) da korisniku u postavkama ne vise duplikati.
+                try {
+                    deleteNotificationChannel(LEGACY_NOTIFICATION_CHANNEL_ID_INCOMING)
+                    deleteNotificationChannel(LEGACY_NOTIFICATION_CHANNEL_ID_INCOMING_V2)
+                } catch (_: Exception) {}
+
                 var channelCall = getNotificationChannel(NOTIFICATION_CHANNEL_ID_INCOMING)
                 if (channelCall != null) {
                     channelCall.setSound(null, null)
+                    // MOJIAPP FORK: bypass i na POSTOJEĆEM kanalu — Android to
+                    // poštuje tek kad app ima "Ne ometaj pristup" (policy
+                    // access); bez njega je no-op, pa je sigurno zvati uvijek.
+                    if (!channelCall.canBypassDnd()) channelCall.setBypassDnd(true)
                 } else {
                     channelCall = NotificationChannel(
                         NOTIFICATION_CHANNEL_ID_INCOMING,
@@ -928,6 +949,10 @@ class CallkitNotificationManager(
                         enableLights(true)
                         enableVibration(true)
                         setSound(null, null)
+                        // MOJIAPP FORK: dolazni POZIV zvoni i kroz Ne ometaj /
+                        // mod Spavanje — kao pravi telefon (Igor 2026-07-23).
+                        // Vrijedi samo pri KREIRANJU kanala.
+                        setBypassDnd(true)
                     }
                 }
                 channelCall.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
@@ -1022,7 +1047,11 @@ class CallkitNotificationManager(
             if (intent?.action == ACTION_VOLUME_CHANGED) {
                 val streamType =
                     intent.getIntExtra(EXTRA_VOLUME_STREAM_TYPE, -1)
-                if (streamType != AudioManager.STREAM_RING) {
+                // MOJIAPP FORK: pod DND-om zvono svira na STREAM_ALARM
+                // (CallkitSoundPlayerManager.isDndActive), pa gumb za glasnocu
+                // mora utisati i taj stream — upstream filtrira samo STREAM_RING.
+                if (streamType != AudioManager.STREAM_RING &&
+                    streamType != AudioManager.STREAM_ALARM) {
                     return
                 }
                 if (callkitSoundPlayerManager?.isPlaying == true) {
@@ -1035,7 +1064,37 @@ class CallkitNotificationManager(
 
     @SuppressLint("MissingPermission")
     fun showIncomingNotification(data: Bundle) {
-        val callkitNotification = getIncomingNotification(data)
+        // MOJIAPP FORK: Android 14+ odbija CallStyle notifikaciju koja ne
+        // dolazi iz FGS-a ili full-screen intenta. USE_FULL_SCREEN_INTENT je
+        // ugasen (Play odbio, odluka stoji), a foreground service je Play
+        // ODOBRIO (Igor, video appeal) — zato na 14+ zvono dize
+        // CallkitNotificationService.startForeground umjesto notify().
+        // Wake-lock i zvuk ostaju ovdje (vrijede za oba puta).
+        val useFgsForIncoming =
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE
+        if (useFgsForIncoming) {
+            createNotificationChanel(data)
+        }
+        val callkitNotification = if (useFgsForIncoming) null else getIncomingNotification(data)
+
+        // MOJIAPP FORK: Samsung mod Spavanje (DND) potiskuje fullScreenIntent
+        // kroz zen policy suppressedVisualEffects (bit 4) ČAK I uz bypassDnd
+        // kanal — poziv zvoni, ekran mrtav, a odgođeni FSI opali tek na
+        // unlock. Fallback: sami probudimo ekran wake-lockom pa je poziv
+        // odmah vidljiv na lockscreenu (Igor 2026-07-23).
+        try {
+            val pm = context.getSystemService(Context.POWER_SERVICE) as android.os.PowerManager
+            if (!pm.isInteractive) {
+                @Suppress("DEPRECATION")
+                val wl = pm.newWakeLock(
+                    android.os.PowerManager.SCREEN_BRIGHT_WAKE_LOCK
+                        or android.os.PowerManager.ACQUIRE_CAUSES_WAKEUP,
+                    "Callkit:IncomingWake"
+                )
+                wl.acquire(10_000L)
+            }
+        } catch (_: Exception) {}
+
         if (incomingChannelEnabled()) {
             callkitSoundPlayerManager?.play(data)
             // Start Signify modification
@@ -1045,6 +1104,12 @@ class CallkitNotificationManager(
                 IntentFilter(ACTION_VOLUME_CHANGED)
             )
             // End Signify modification
+        }
+        if (useFgsForIncoming) {
+            CallkitNotificationService.startServiceWithAction(
+                context, CallkitConstants.ACTION_CALL_INCOMING, data
+            )
+            return
         }
         callkitNotification?.let {
             getNotificationManager().notify(

@@ -56,6 +56,10 @@ class CallkitIncomingActivity : Activity() {
 
         fun getIntentEnded(context: Context, isAccepted: Boolean): Intent {
             val intent = Intent("${context.packageName}.${ACTION_ENDED_CALL_INCOMING}")
+            // MOJIAPP FORK: bez foreground queue-a Android cached procesu
+            // dostavi broadcast s ~10s odgode → plavi ekran ostane visjeti
+            // nakon što pozivatelj prekine (zvuk stane, ekran ne).
+            intent.addFlags(Intent.FLAG_RECEIVER_FOREGROUND)
             intent.putExtra("ACCEPTED", isAccepted)
             intent.setPackage(context.packageName)
             intent.setClassName(
@@ -180,6 +184,30 @@ class CallkitIncomingActivity : Activity() {
         val data = intent.extras?.getBundle(CallkitConstants.EXTRA_CALLKIT_INCOMING_DATA)
         if (data == null) finish()
 
+        // MOJIAPP FORK: fullScreenIntent zna opaliti ZAKAŠNJELO (npr. tek na
+        // unlock, nakon DND/Doze odgode) za poziv koji je odavno završio —
+        // ended broadcast je tada već prošao i nema tko zatvoriti ekran.
+        // Ako poziv više nije aktivan (endCall/decline ga je maknuo iz
+        // activeCalls), odmah se ugasi (Igor 2026-07-23).
+        val callId = data?.getString(CallkitConstants.EXTRA_CALLKIT_ID, "")
+        if (!callId.isNullOrEmpty()) {
+            val stillActive = try {
+                getDataActiveCalls(this).any { it.id == callId && !it.isAccepted }
+            } catch (_: Exception) { true }
+            if (!stillActive) {
+                finish()
+                return
+            }
+        }
+        // I VREMENSKA provjera: pod DND-om cancel FCM zna kasniti pa je
+        // mrtav poziv još "aktivan" u registru — zakašnjeli FSI stariji od
+        // ring prozora (60s) se svejedno ne prikazuje.
+        val startedAt = data?.getLong(CallkitNotificationManager.EXTRA_TIME_START_CALL, 0L) ?: 0L
+        if (startedAt > 0L && System.currentTimeMillis() - startedAt > 60_000L) {
+            finish()
+            return
+        }
+
         val isShowFullLockedScreen =
             data?.getBoolean(CallkitConstants.EXTRA_CALLKIT_IS_SHOW_FULL_LOCKED_SCREEN, true)
         if (isShowFullLockedScreen == true) {
@@ -262,7 +290,7 @@ class CallkitIncomingActivity : Activity() {
         }
 
         val backgroundColor =
-            data?.getString(CallkitConstants.EXTRA_CALLKIT_BACKGROUND_COLOR, "#0955fa")
+            data?.getString(CallkitConstants.EXTRA_CALLKIT_BACKGROUND_COLOR, "#1C1B22")
         try {
             ivBackground.setBackgroundColor(Color.parseColor(backgroundColor))
         } catch (error: Exception) {

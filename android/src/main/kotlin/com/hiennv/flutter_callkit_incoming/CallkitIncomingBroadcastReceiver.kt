@@ -232,14 +232,16 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                 try {
                     registerTelecomIncomingCall(context, data)
                     val incomingData = Data.fromBundle(data)
-                    if (incomingData.isFullScreen) {
-                        val intent = CallkitIncomingActivity.getIntent(context, data)
-                        context.startActivity(intent)
-                    } else {
-                        getCallkitNotificationManager()?.showIncomingNotification(data)
-                        sendEventFlutter(CallkitConstants.ACTION_CALL_INCOMING, data)
-                        addCall(context, incomingData)
-                    }
+                    // MOJIAPP FORK: incoming UVIJEK kroz notifikaciju — mali
+                    // heads-up s Prihvati/Odbaci kad je ekran upaljen, a plavi
+                    // full-screen SAMO na zaključanom (setFullScreenIntent).
+                    // Upstream startActivity grana (isFullScreen) nije imala
+                    // zvuk, addCall (cancel ne gasi → beskonačna zvonjava) ni
+                    // timeout, a startActivity iz pozadine Android ionako
+                    // blokira → poziv završi nijemo u taskbaru.
+                    getCallkitNotificationManager()?.showIncomingNotification(data)
+                    sendEventFlutter(CallkitConstants.ACTION_CALL_INCOMING, data)
+                    addCall(context, incomingData)
                 } catch (error: Exception) {
                     Log.e(TAG, null, error)
                 }
