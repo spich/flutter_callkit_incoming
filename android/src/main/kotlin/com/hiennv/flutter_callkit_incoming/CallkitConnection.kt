@@ -117,12 +117,30 @@ class CallkitConnection(
         super.onReject()
         Log.d(TAG, "onReject id=$callId")
         finishWithCause(DisconnectCause.REJECTED)
+        javiAppu(CallkitIncomingBroadcastReceiver.getIntentDecline(appContext, bundle))
     }
 
     override fun onDisconnect() {
         super.onDisconnect()
         Log.d(TAG, "onDisconnect id=$callId")
         finishWithCause(DisconnectCause.LOCAL)
+        javiAppu(CallkitIncomingBroadcastReceiver.getIntentEnded(appContext, bundle))
+    }
+
+    /**
+     * MOJIAPP FORK: odbijanje/prekid IZVAN naše obavijesti (sat, auto) mora
+     * stići do appa kao da je iz obavijesti — inače Telecom poziv ugasi, a
+     * LiveKit razgovor i server ostanu „podignuti" (Igor 2026-10-12: prekid na
+     * satu, obje strane ostale u pozivu). Naš vlastiti završetak ide kroz
+     * markEnded/markDeclined (setDisconnected), ne kroz ove povratne pozive,
+     * pa nema petlje.
+     */
+    private fun javiAppu(intent: Intent) {
+        try {
+            appContext.sendBroadcast(intent)
+        } catch (e: Exception) {
+            Log.w(TAG, "javiAppu id=$callId: ${e.message}")
+        }
     }
 
     override fun onAbort() {
