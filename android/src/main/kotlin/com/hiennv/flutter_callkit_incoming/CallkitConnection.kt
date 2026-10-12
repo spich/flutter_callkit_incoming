@@ -95,6 +95,21 @@ class CallkitConnection(
     override fun onAnswer() {
         super.onAnswer()
         Log.d(TAG, "onAnswer id=$callId")
+        // MOJIAPP FORK: javljanje IZVAN naše obavijesti (sat, auto, BT
+        // slušalice) ide istim putem kao „Prihvati" u obavijesti. Prije je
+        // samo označilo poziv aktivnim: app nije saznao, pozivatelju je zvonilo
+        // dalje, a poziv je ostao mrtav (Igor 2026-10-12, Garmin Venu 3).
+        // Pokreće se iz konteksta Connectiona dok poziv još zvoni — PHONE_CALL
+        // iznimka za pokretanje aktivnosti iz pozadine (vidi markDeclined).
+        try {
+            val i = TransparentActivity.getIntent(appContext, CallkitConstants.ACTION_CALL_ACCEPT, bundle)
+            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            appContext.startActivity(i)
+            Log.d(TAG, "onAnswer → accept kao iz obavijesti id=$callId")
+        } catch (e: Exception) {
+            Log.w(TAG, "onAnswer: aktivnost nije pokrenuta (${e.message}) — šaljem samo accept")
+            appContext.sendBroadcast(CallkitIncomingBroadcastReceiver.getIntentAccept(appContext, bundle))
+        }
         setActive()
     }
 
