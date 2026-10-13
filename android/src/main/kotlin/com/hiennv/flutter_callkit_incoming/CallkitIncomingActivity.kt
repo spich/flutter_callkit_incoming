@@ -62,10 +62,12 @@ class CallkitIncomingActivity : Activity() {
             intent.addFlags(Intent.FLAG_RECEIVER_FOREGROUND)
             intent.putExtra("ACCEPTED", isAccepted)
             intent.setPackage(context.packageName)
-            intent.setClassName(
-                context.packageName,
-                "com.hiennv.flutter_callkit_incoming.CallkitIncomingActivity"
-            )
+            // MOJIAPP FORK: BEZ setClassName. Upstream je tu postavljao
+            // komponentu (Activity), a namjeru s komponentom Android dostavlja
+            // samo prijemnicima iz manifesta — dinamički registriran prijemnik
+            // ovog ekrana ju nikad nije dobio. Ekran se zatvarao tek na
+            // isteku zvonjenja (30 s), npr. nakon odbijanja na satu
+            // (Igor 2026-10-13, S931: 07:41:12 → 07:41:42).
             return intent
         }
     }
