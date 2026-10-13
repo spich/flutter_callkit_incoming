@@ -50,7 +50,11 @@ class CallkitIncomingActivity : Activity() {
                 setClassName(context.packageName, "com.hiennv.flutter_callkit_incoming.CallkitIncomingActivity")
                 action = "${context.packageName}.${CallkitConstants.ACTION_CALL_INCOMING}"
                 putExtra(CallkitConstants.EXTRA_CALLKIT_INCOMING_DATA, data)
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                // MOJIAPP FORK: zastavica na NAMJERI zadatka — `excludeFromRecents`
+                // iz manifesta drži samo dok je aktivnost živa; prazan zadatak
+                // ekrana poziva ostajao je među nedavnima (Igor 2026-10-13, S931).
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK or
+                    Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS
                 `package` = context.packageName
             }
 
@@ -197,7 +201,7 @@ class CallkitIncomingActivity : Activity() {
                 getDataActiveCalls(this).any { it.id == callId && !it.isAccepted }
             } catch (_: Exception) { true }
             if (!stillActive) {
-                finish()
+                finishTask()
                 return
             }
         }
@@ -206,7 +210,7 @@ class CallkitIncomingActivity : Activity() {
         // ring prozora (60s) se svejedno ne prikazuje.
         val startedAt = data?.getLong(CallkitNotificationManager.EXTRA_TIME_START_CALL, 0L) ?: 0L
         if (startedAt > 0L && System.currentTimeMillis() - startedAt > 60_000L) {
-            finish()
+            finishTask()
             return
         }
 
@@ -383,7 +387,9 @@ class CallkitIncomingActivity : Activity() {
         startActivity(acceptIntent)
 
         dismissKeyguard()
-        finish()
+        // MOJIAPP FORK: i zadatak, ne samo aktivnost — inače ostaje prazan
+        // „sistemski poziv" među otvorenim aplikacijama.
+        finishTask()
     }
 
     private fun dismissKeyguard() {
