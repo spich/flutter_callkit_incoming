@@ -730,7 +730,12 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         }
         call.endCall()
         self.callManager.removeCall(call)
-        if (self.answerCall == nil && self.outgoingCall == nil) {
+        // MOJIAPP FORK: „razgovor" je samo poziv koji JE prihvaćeni/odlazni.
+        // Upstream je gledao postoji li IKOJI prihvaćeni — pa je kraj starog,
+        // nejavljenog poziva nakon što je novi prihvaćen brisao `answerCall`
+        // (audio sesija novog) i javljao ENDED umjesto odbijanja.
+        let jeRazgovor = call.uuid == self.answerCall?.uuid || call.uuid == self.outgoingCall?.uuid
+        if (!jeRazgovor) {
             // MOJIAPP FORK: podaci UGAŠENOG poziva, ne `self.data` (zadnji
             // prijavljeni). Kraj starog poziva dok novi već zvoni slao je
             // „odbijeno" s podacima NOVOG — app je serveru odbio novi poziv
@@ -743,7 +748,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
                 action.fulfill()
             }
         }else {
-            self.answerCall = nil
+            if call.uuid == self.answerCall?.uuid { self.answerCall = nil }
             sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_ENDED, call.data.toJSON())
             if let appDelegate = UIApplication.shared.delegate as? CallkitIncomingAppDelegate {
                 appDelegate.onEnd(call, action)
