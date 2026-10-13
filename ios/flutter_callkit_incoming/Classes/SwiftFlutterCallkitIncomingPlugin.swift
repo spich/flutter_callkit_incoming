@@ -396,8 +396,19 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         // Guard against malformed UUID — see CallManager.swift:startCall for rationale.
         // PushKit branch reads uuid from self.data (stored during showCallkitIncoming);
         // non-PushKit reads from the incoming data. Either source can be invalid.
+        // MOJIAPP FORK: UVIJEK uuid koji je pozivatelj tražio. Upstream je za
+        // poziv iz PushKita uzimao `self.data.uuid` — uuid ZADNJEG PushKit
+        // poziva — pa je kraj ili istek PRETHODNOG poziva gasio poziv koji
+        // upravo zvoni (Igor 2026-10-13, i11: „propušteni od prošlog prekine
+        // novo pozivanje"). Pohranjeni se koristi samo kad uuid nije poslan.
         let uuidSourceString: String
-        if self.isFromPushKit {
+        if !data.uuid.isEmpty, UUID(uuidString: data.uuid) != nil {
+            uuidSourceString = data.uuid
+            if self.isFromPushKit, self.data?.uuid.lowercased() == data.uuid.lowercased() {
+                self.isFromPushKit = false
+                self.sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_ENDED, data.toJSON())
+            }
+        } else if self.isFromPushKit {
             guard let stored = self.data else {
                 NSLog("[CallkitIncoming] endCall: PushKit branch but self.data is nil — ignored")
                 return
@@ -420,8 +431,14 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     
     @objc public func connectedCall(_ data: Data) {
         // Guard against malformed UUID — see CallManager.swift:startCall for rationale.
+        // MOJIAPP FORK: kao endCall — traženi uuid, ne zadnji PushKit.
         let uuidSourceString: String
-        if self.isFromPushKit {
+        if !data.uuid.isEmpty, UUID(uuidString: data.uuid) != nil {
+            uuidSourceString = data.uuid
+            if self.data?.uuid.lowercased() == data.uuid.lowercased() {
+                self.isFromPushKit = false
+            }
+        } else if self.isFromPushKit {
             guard let stored = self.data else {
                 NSLog("[CallkitIncoming] connectedCall: PushKit branch but self.data is nil — ignored")
                 return
