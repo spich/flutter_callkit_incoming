@@ -717,10 +717,13 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
             // TIMEOUT) so the app can notify its backend and stop ringing elsewhere.
             // Fulfill (not fail) the action: failing a legitimate end action leaves
             // a stale call in the system UI.
+            // MOJIAPP FORK: podaci SAMO ako su upravo ovog poziva — `self.data`
+            // je zadnji prijavljeni poziv, pa bi app odbio onaj koji sad zvoni.
+            let podaci = self.podaciPoziva(action.callUUID)
             if(self.answerCall == nil && self.outgoingCall == nil){
-                sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_DECLINE, self.data?.toJSON())
+                sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_DECLINE, podaci)
             } else {
-                sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_ENDED, self.data?.toJSON())
+                sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_ENDED, podaci)
             }
             action.fulfill()
             return
@@ -728,7 +731,12 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         call.endCall()
         self.callManager.removeCall(call)
         if (self.answerCall == nil && self.outgoingCall == nil) {
-            sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_DECLINE, self.data?.toJSON())
+            // MOJIAPP FORK: podaci UGAŠENOG poziva, ne `self.data` (zadnji
+            // prijavljeni). Kraj starog poziva dok novi već zvoni slao je
+            // „odbijeno" s podacima NOVOG — app je serveru odbio novi poziv
+            // (Igor 2026-10-13, i17 business: ponovni poziv unutar ~4 s
+            // od prekida se prekidao).
+            sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_DECLINE, call.data.toJSON())
             if let appDelegate = UIApplication.shared.delegate as? CallkitIncomingAppDelegate {
                 appDelegate.onDecline(call, action)
             } else {
@@ -795,7 +803,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
             action.fail()
             return
         }
-        sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_TIMEOUT, self.data?.toJSON())
+        sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_TIMEOUT, call.data.toJSON())
         if let appDelegate = UIApplication.shared.delegate as? CallkitIncomingAppDelegate {
             appDelegate.onTimeOut(call)
         }
@@ -865,6 +873,16 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     }
     
     
+    /// MOJIAPP FORK: podaci za događaj poziva kojeg više nema u managera —
+    /// `self.data` samo ako je to baš taj poziv, inače samo id (app tada ne
+    /// zna callId i ne šalje ništa serveru).
+    private func podaciPoziva(_ uuid: UUID) -> [String: Any]? {
+        if let d = self.data, d.uuid.lowercased() == uuid.uuidString.lowercased() {
+            return d.toJSON()
+        }
+        return ["id": uuid.uuidString]
+    }
+
     private func showMissedCallNotification(_ data: Data) {
         if(!data.isShowMissedCallNotification){
             return
