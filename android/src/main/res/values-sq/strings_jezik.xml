@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generirano: tools/prijevodi/izvorni_tekstovi.py -->
+<resources>
+    <string name="text_accept">Prano</string>
+    <string name="text_decline">Refuzo</string>
+    <string name="text_missed_call">Telefonatë e humbur</string>
+    <string name="text_call_back">Ktheji telefonatën</string>
+    <string name="text_calling">Duke telefonuar…</string>
+    <string name="text_hang_up">Mbyll</string>
+    <string name="text_title_post_notification">Leja për njoftime</string>
+    <string name="text_post_notification_message_required">Kërkohet leja për njoftime. Të lutem lejo njoftimet te Cilësimet.</string>
+    <string name="text_channel_incoming">Telefonata hyrëse</string>
+    <string name="text_channel_missed">Telefonata të humbura</string>
+    <string name="text_channel_ongoing">Telefonatë në vazhdim</string>
+</resources>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generirano: tools/prijevodi/izvorni_tekstovi.py -->
+<resources>
+    <string name="text_accept">Aceitar</string>
+    <string name="text_decline">Recusar</string>
+    <string name="text_missed_call">Chamada perdida</string>
+    <string name="text_call_back">Devolver chamada</string>
+    <string name="text_calling">A chamar…</string>
+    <string name="text_hang_up">Desligar</string>
+    <string name="text_title_post_notification">Permissão de notificações</string>
+    <string name="text_post_notification_message_required">É necessária a permissão para notificações. Permite as notificações nas Definições.</string>
+    <string name="text_channel_incoming">Chamadas recebidas</string>
+    <string name="text_channel_missed">Chamadas perdidas</string>
+    <string name="text_channel_ongoing">Chamada em curso</string>
+</resources>

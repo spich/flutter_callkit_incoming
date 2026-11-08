@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generirano: tools/prijevodi/izvorni_tekstovi.py -->
+<resources>
+    <string name="text_accept">Αποδοχή</string>
+    <string name="text_decline">Απόρριψη</string>
+    <string name="text_missed_call">Αναπάντητη κλήση</string>
+    <string name="text_call_back">Επιστροφή κλήσης</string>
+    <string name="text_calling">Κλήση…</string>
+    <string name="text_hang_up">Τερματισμός</string>
+    <string name="text_title_post_notification">Άδεια ειδοποιήσεων</string>
+    <string name="text_post_notification_message_required">Απαιτείται άδεια για ειδοποιήσεις. Επίτρεψε τις ειδοποιήσεις στις Ρυθμίσεις.</string>
+    <string name="text_channel_incoming">Εισερχόμενες κλήσεις</string>
+    <string name="text_channel_missed">Αναπάντητες κλήσεις</string>
+    <string name="text_channel_ongoing">Κλήση σε εξέλιξη</string>
+</resources>

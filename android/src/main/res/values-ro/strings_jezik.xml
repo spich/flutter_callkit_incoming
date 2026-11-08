@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generirano: tools/prijevodi/izvorni_tekstovi.py -->
+<resources>
+    <string name="text_accept">Acceptă</string>
+    <string name="text_decline">Respinge</string>
+    <string name="text_missed_call">Apel pierdut</string>
+    <string name="text_call_back">Sună înapoi</string>
+    <string name="text_calling">Se apelează…</string>
+    <string name="text_hang_up">Închide</string>
+    <string name="text_title_post_notification">Permisiune pentru notificări</string>
+    <string name="text_post_notification_message_required">Permisiunea pentru notificări este necesară. Permite notificările în Setări.</string>
+    <string name="text_channel_incoming">Apeluri primite</string>
+    <string name="text_channel_missed">Apeluri pierdute</string>
+    <string name="text_channel_ongoing">Apel în curs</string>
+</resources>

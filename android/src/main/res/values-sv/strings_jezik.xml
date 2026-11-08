@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generirano: tools/prijevodi/izvorni_tekstovi.py -->
+<resources>
+    <string name="text_accept">Svara</string>
+    <string name="text_decline">Avvisa</string>
+    <string name="text_missed_call">Missat samtal</string>
+    <string name="text_call_back">Ring tillbaka</string>
+    <string name="text_calling">Ringer…</string>
+    <string name="text_hang_up">Lägg på</string>
+    <string name="text_title_post_notification">Behörighet för notiser</string>
+    <string name="text_post_notification_message_required">Behörighet för notiser krävs. Tillåt notiser i Inställningar.</string>
+    <string name="text_channel_incoming">Inkommande samtal</string>
+    <string name="text_channel_missed">Missade samtal</string>
+    <string name="text_channel_ongoing">Pågående samtal</string>
+</resources>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generirano: tools/prijevodi/izvorni_tekstovi.py -->
+<resources>
+    <string name="text_accept">Accepteren</string>
+    <string name="text_decline">Weigeren</string>
+    <string name="text_missed_call">Gemiste oproep</string>
+    <string name="text_call_back">Terugbellen</string>
+    <string name="text_calling">Bellen…</string>
+    <string name="text_hang_up">Ophangen</string>
+    <string name="text_title_post_notification">Toestemming voor meldingen</string>
+    <string name="text_post_notification_message_required">Toestemming voor meldingen is vereist. Sta meldingen toe in Instellingen.</string>
+    <string name="text_channel_incoming">Inkomende oproepen</string>
+    <string name="text_channel_missed">Gemiste oproepen</string>
+    <string name="text_channel_ongoing">Lopende oproep</string>
+</resources>

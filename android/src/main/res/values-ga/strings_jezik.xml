@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generirano: tools/prijevodi/izvorni_tekstovi.py -->
+<resources>
+    <string name="text_accept">Glac</string>
+    <string name="text_decline">Diúltaigh</string>
+    <string name="text_missed_call">Glao caillte</string>
+    <string name="text_call_back">Cuir glao ar ais</string>
+    <string name="text_calling">Ag glaoch…</string>
+    <string name="text_hang_up">Croch suas</string>
+    <string name="text_title_post_notification">Cead fógraí</string>
+    <string name="text_post_notification_message_required">Tá cead fógraí riachtanach. Ceadaigh fógraí sna Socruithe, le do thoil.</string>
+    <string name="text_channel_incoming">Glaonna isteach</string>
+    <string name="text_channel_missed">Glaonna caillte</string>
+    <string name="text_channel_ongoing">Glao ar siúl</string>
+</resources>

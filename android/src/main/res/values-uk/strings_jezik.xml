@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generirano: tools/prijevodi/izvorni_tekstovi.py -->
+<resources>
+    <string name="text_accept">Прийняти</string>
+    <string name="text_decline">Відхилити</string>
+    <string name="text_missed_call">Пропущений дзвінок</string>
+    <string name="text_call_back">Передзвонити</string>
+    <string name="text_calling">Дзвінок…</string>
+    <string name="text_hang_up">Завершити</string>
+    <string name="text_title_post_notification">Дозвіл на сповіщення</string>
+    <string name="text_post_notification_message_required">Потрібен дозвіл на сповіщення. Увімкни сповіщення в Налаштуваннях.</string>
+    <string name="text_channel_incoming">Вхідні дзвінки</string>
+    <string name="text_channel_missed">Пропущені дзвінки</string>
+    <string name="text_channel_ongoing">Поточний дзвінок</string>
+</resources>

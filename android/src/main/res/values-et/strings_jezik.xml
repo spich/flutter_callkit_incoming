@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generirano: tools/prijevodi/izvorni_tekstovi.py -->
+<resources>
+    <string name="text_accept">Võta vastu</string>
+    <string name="text_decline">Keeldu</string>
+    <string name="text_missed_call">Vastamata kõne</string>
+    <string name="text_call_back">Helista tagasi</string>
+    <string name="text_calling">Helistan…</string>
+    <string name="text_hang_up">Lõpeta kõne</string>
+    <string name="text_title_post_notification">Teavituste luba</string>
+    <string name="text_post_notification_message_required">Vaja on teavituste luba. Luba teavitused seadetes.</string>
+    <string name="text_channel_incoming">Sissetulevad kõned</string>
+    <string name="text_channel_missed">Vastamata kõned</string>
+    <string name="text_channel_ongoing">Käimasolev kõne</string>
+</resources>

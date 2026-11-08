@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generirano: tools/prijevodi/izvorni_tekstovi.py -->
+<resources>
+    <string name="text_accept">Hyväksy</string>
+    <string name="text_decline">Hylkää</string>
+    <string name="text_missed_call">Vastaamatta jäänyt puhelu</string>
+    <string name="text_call_back">Soita takaisin</string>
+    <string name="text_calling">Soitetaan…</string>
+    <string name="text_hang_up">Lopeta puhelu</string>
+    <string name="text_title_post_notification">Ilmoitusten käyttöoikeus</string>
+    <string name="text_post_notification_message_required">Ilmoitusten käyttöoikeus tarvitaan. Salli ilmoitukset Asetuksissa.</string>
+    <string name="text_channel_incoming">Saapuvat puhelut</string>
+    <string name="text_channel_missed">Vastaamatta jääneet puhelut</string>
+    <string name="text_channel_ongoing">Käynnissä oleva puhelu</string>
+</resources>

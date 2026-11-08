@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generirano: tools/prijevodi/izvorni_tekstovi.py -->
+<resources>
+    <string name="text_accept">Annehmen</string>
+    <string name="text_decline">Ablehnen</string>
+    <string name="text_missed_call">Verpasster Anruf</string>
+    <string name="text_call_back">Zurückrufen</string>
+    <string name="text_calling">Anruf läuft…</string>
+    <string name="text_hang_up">Auflegen</string>
+    <string name="text_title_post_notification">Benachrichtigungsberechtigung</string>
+    <string name="text_post_notification_message_required">Die Berechtigung für Benachrichtigungen ist erforderlich. Bitte erlaube Benachrichtigungen in den Einstellungen.</string>
+    <string name="text_channel_incoming">Eingehende Anrufe</string>
+    <string name="text_channel_missed">Verpasste Anrufe</string>
+    <string name="text_channel_ongoing">Laufender Anruf</string>
+</resources>

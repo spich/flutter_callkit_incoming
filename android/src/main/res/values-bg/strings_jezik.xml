@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generirano: tools/prijevodi/izvorni_tekstovi.py -->
+<resources>
+    <string name="text_accept">Приеми</string>
+    <string name="text_decline">Отхвърли</string>
+    <string name="text_missed_call">Пропуснато обаждане</string>
+    <string name="text_call_back">Обади се обратно</string>
+    <string name="text_calling">Обаждане…</string>
+    <string name="text_hang_up">Затвори</string>
+    <string name="text_title_post_notification">Разрешение за известия</string>
+    <string name="text_post_notification_message_required">Необходимо е разрешение за известия. Разреши известията от Настройки.</string>
+    <string name="text_channel_incoming">Входящи обаждания</string>
+    <string name="text_channel_missed">Пропуснати обаждания</string>
+    <string name="text_channel_ongoing">Текущо обаждане</string>
+</resources>

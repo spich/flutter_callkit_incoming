@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generirano: tools/prijevodi/izvorni_tekstovi.py -->
+<resources>
+    <string name="text_accept">Elfogadás</string>
+    <string name="text_decline">Elutasítás</string>
+    <string name="text_missed_call">Nem fogadott hívás</string>
+    <string name="text_call_back">Visszahívás</string>
+    <string name="text_calling">Hívás…</string>
+    <string name="text_hang_up">Befejezés</string>
+    <string name="text_title_post_notification">Értesítési engedély</string>
+    <string name="text_post_notification_message_required">Értesítési engedélyre van szükség. Engedélyezd az értesítéseket a Beállításokban.</string>
+    <string name="text_channel_incoming">Bejövő hívások</string>
+    <string name="text_channel_missed">Nem fogadott hívások</string>
+    <string name="text_channel_ongoing">Folyamatban lévő hívás</string>
+</resources>

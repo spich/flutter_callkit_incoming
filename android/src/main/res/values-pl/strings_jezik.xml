@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generirano: tools/prijevodi/izvorni_tekstovi.py -->
+<resources>
+    <string name="text_accept">Odbierz</string>
+    <string name="text_decline">Odrzuć</string>
+    <string name="text_missed_call">Nieodebrane połączenie</string>
+    <string name="text_call_back">Oddzwoń</string>
+    <string name="text_calling">Dzwonienie…</string>
+    <string name="text_hang_up">Zakończ</string>
+    <string name="text_title_post_notification">Uprawnienie do powiadomień</string>
+    <string name="text_post_notification_message_required">Wymagane jest uprawnienie do powiadomień. Zezwól na powiadomienia w Ustawieniach.</string>
+    <string name="text_channel_incoming">Połączenia przychodzące</string>
+    <string name="text_channel_missed">Nieodebrane połączenia</string>
+    <string name="text_channel_ongoing">Trwające połączenie</string>
+</resources>

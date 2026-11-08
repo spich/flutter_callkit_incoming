@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generirano: tools/prijevodi/izvorni_tekstovi.py -->
+<resources>
+    <string name="text_accept">Sprejmi</string>
+    <string name="text_decline">Zavrni</string>
+    <string name="text_missed_call">Zgrešen klic</string>
+    <string name="text_call_back">Pokliči nazaj</string>
+    <string name="text_calling">Klicanje…</string>
+    <string name="text_hang_up">Prekini</string>
+    <string name="text_title_post_notification">Dovoljenje za obvestila</string>
+    <string name="text_post_notification_message_required">Dovoljenje za obvestila je obvezno. Dovoli obvestila v Nastavitvah.</string>
+    <string name="text_channel_incoming">Dohodni klici</string>
+    <string name="text_channel_missed">Zgrešeni klici</string>
+    <string name="text_channel_ongoing">Klic v teku</string>
+</resources>

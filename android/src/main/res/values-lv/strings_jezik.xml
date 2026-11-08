@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generirano: tools/prijevodi/izvorni_tekstovi.py -->
+<resources>
+    <string name="text_accept">Pieņemt</string>
+    <string name="text_decline">Noraidīt</string>
+    <string name="text_missed_call">Neatbildēts zvans</string>
+    <string name="text_call_back">Atzvanīt</string>
+    <string name="text_calling">Zvana…</string>
+    <string name="text_hang_up">Beigt zvanu</string>
+    <string name="text_title_post_notification">Atļauja paziņojumiem</string>
+    <string name="text_post_notification_message_required">Nepieciešama atļauja paziņojumiem. Lūdzu, atļauj paziņojumus iestatījumos.</string>
+    <string name="text_channel_incoming">Ienākošie zvani</string>
+    <string name="text_channel_missed">Neatbildētie zvani</string>
+    <string name="text_channel_ongoing">Notiekošs zvans</string>
+</resources>

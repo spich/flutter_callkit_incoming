@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generirano: tools/prijevodi/izvorni_tekstovi.py -->
+<resources>
+    <string name="text_accept">Accetta</string>
+    <string name="text_decline">Rifiuta</string>
+    <string name="text_missed_call">Chiamata persa</string>
+    <string name="text_call_back">Richiama</string>
+    <string name="text_calling">Chiamata in corso…</string>
+    <string name="text_hang_up">Termina</string>
+    <string name="text_title_post_notification">Autorizzazione per le notifiche</string>
+    <string name="text_post_notification_message_required">L\'autorizzazione per le notifiche è obbligatoria. Consenti le notifiche nelle Impostazioni.</string>
+    <string name="text_channel_incoming">Chiamate in arrivo</string>
+    <string name="text_channel_missed">Chiamate perse</string>
+    <string name="text_channel_ongoing">Chiamata in corso</string>
+</resources>

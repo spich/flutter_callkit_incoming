@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generirano: tools/prijevodi/izvorni_tekstovi.py -->
+<resources>
+    <string name="text_accept">Prijať</string>
+    <string name="text_decline">Odmietnuť</string>
+    <string name="text_missed_call">Zmeškaný hovor</string>
+    <string name="text_call_back">Zavolať späť</string>
+    <string name="text_calling">Volanie…</string>
+    <string name="text_hang_up">Zavesiť</string>
+    <string name="text_title_post_notification">Povolenie pre upozornenia</string>
+    <string name="text_post_notification_message_required">Povolenie pre upozornenia je povinné. Povoľ upozornenia v Nastaveniach.</string>
+    <string name="text_channel_incoming">Prichádzajúce hovory</string>
+    <string name="text_channel_missed">Zmeškané hovory</string>
+    <string name="text_channel_ongoing">Prebiehajúci hovor</string>
+</resources>

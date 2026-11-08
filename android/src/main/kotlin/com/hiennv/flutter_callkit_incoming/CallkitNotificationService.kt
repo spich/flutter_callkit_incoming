@@ -250,7 +250,7 @@ class CallkitNotificationService : Service() {
                 CallkitNotificationManager.NOTIFICATION_CHANNEL_ID_ONGOING
             )
                 .setContentTitle(applicationInfo.loadLabel(packageManager))
-                .setContentText("Calling...")
+                .setContentText(getString(R.string.text_calling))
                 .setSmallIcon(smallIcon)
                 .setOngoing(true)
                 .build()

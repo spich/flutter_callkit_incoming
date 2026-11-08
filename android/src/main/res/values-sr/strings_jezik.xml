@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generirano: tools/prijevodi/izvorni_tekstovi.py -->
+<resources>
+    <string name="text_accept">Prihvati</string>
+    <string name="text_decline">Odbij</string>
+    <string name="text_missed_call">Propušten poziv</string>
+    <string name="text_call_back">Uzvrati poziv</string>
+    <string name="text_calling">Poziva se…</string>
+    <string name="text_hang_up">Prekini</string>
+    <string name="text_title_post_notification">Dozvola za obaveštenja</string>
+    <string name="text_post_notification_message_required">Potrebna je dozvola za obaveštenja. Dozvoli obaveštenja u Podešavanjima.</string>
+    <string name="text_channel_incoming">Dolazni pozivi</string>
+    <string name="text_channel_missed">Propušteni pozivi</string>
+    <string name="text_channel_ongoing">Poziv u toku</string>
+</resources>

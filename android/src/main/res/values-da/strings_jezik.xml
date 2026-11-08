@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generirano: tools/prijevodi/izvorni_tekstovi.py -->
+<resources>
+    <string name="text_accept">Accepter</string>
+    <string name="text_decline">Afvis</string>
+    <string name="text_missed_call">Mistet opkald</string>
+    <string name="text_call_back">Ring tilbage</string>
+    <string name="text_calling">Ringer op…</string>
+    <string name="text_hang_up">Læg på</string>
+    <string name="text_title_post_notification">Tilladelse til notifikationer</string>
+    <string name="text_post_notification_message_required">Tilladelse til notifikationer er påkrævet. Tillad notifikationer i Indstillinger.</string>
+    <string name="text_channel_incoming">Indgående opkald</string>
+    <string name="text_channel_missed">Mistede opkald</string>
+    <string name="text_channel_ongoing">Igangværende opkald</string>
+</resources>

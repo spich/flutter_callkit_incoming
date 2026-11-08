@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generirano: tools/prijevodi/izvorni_tekstovi.py -->
+<resources>
+    <string name="text_accept">Priimti</string>
+    <string name="text_decline">Atmesti</string>
+    <string name="text_missed_call">Praleistas skambutis</string>
+    <string name="text_call_back">Perskambinti</string>
+    <string name="text_calling">Skambinama…</string>
+    <string name="text_hang_up">Baigti skambutį</string>
+    <string name="text_title_post_notification">Leidimas siųsti pranešimus</string>
+    <string name="text_post_notification_message_required">Reikalingas leidimas siųsti pranešimus. Įjunk pranešimus nustatymuose.</string>
+    <string name="text_channel_incoming">Gaunami skambučiai</string>
+    <string name="text_channel_missed">Praleisti skambučiai</string>
+    <string name="text_channel_ongoing">Vykstantis skambutis</string>
+</resources>

@@ -911,15 +911,16 @@ class CallkitNotificationManager(
     }
 
     fun createNotificationChanel(data: Bundle) {
-        val incomingCallChannelName = data.getString(
-            CallkitConstants.EXTRA_CALLKIT_INCOMING_CALL_NOTIFICATION_CHANNEL_NAME, "Incoming Call"
-        )
-        val missedCallChannelName = data.getString(
-            CallkitConstants.EXTRA_CALLKIT_MISSED_CALL_NOTIFICATION_CHANNEL_NAME, "Missed Call"
-        )
-        val ongoingCallChannelName = data.getString(
-            CallkitConstants.EXTRA_CALLKIT_ONGOING_CALL_NOTIFICATION_CHANNEL_NAME, "Ongoing Call"
-        );
+        // MOJIAPP FORK: nazivi kanala iz resursa (values-<jezik>) — vidi ih
+        // korisnik u postavkama obavijesti, na jeziku uređaja (2026-11-08).
+        fun naziv(kljuc: String, res: Int) =
+            data.getString(kljuc)?.takeIf { it.isNotBlank() } ?: context.getString(res)
+        val incomingCallChannelName = naziv(
+            CallkitConstants.EXTRA_CALLKIT_INCOMING_CALL_NOTIFICATION_CHANNEL_NAME, R.string.text_channel_incoming)
+        val missedCallChannelName = naziv(
+            CallkitConstants.EXTRA_CALLKIT_MISSED_CALL_NOTIFICATION_CHANNEL_NAME, R.string.text_channel_missed)
+        val ongoingCallChannelName = naziv(
+            CallkitConstants.EXTRA_CALLKIT_ONGOING_CALL_NOTIFICATION_CHANNEL_NAME, R.string.text_channel_ongoing)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             getNotificationManager().apply {
@@ -933,6 +934,7 @@ class CallkitNotificationManager(
                 var channelCall = getNotificationChannel(NOTIFICATION_CHANNEL_ID_INCOMING)
                 if (channelCall != null) {
                     channelCall.setSound(null, null)
+                    channelCall.name = incomingCallChannelName
                     // MOJIAPP FORK: bypass i na POSTOJEĆEM kanalu — Android to
                     // poštuje tek kad app ima "Ne ometaj pristup" (policy
                     // access); bez njega je no-op, pa je sigurno zvati uvijek.
