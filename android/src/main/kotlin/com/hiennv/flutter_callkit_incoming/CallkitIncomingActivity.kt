@@ -169,8 +169,9 @@ class CallkitIncomingActivity : Activity() {
                 (WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS
                         or WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION), false
             )
-            window.statusBarColor = Color.TRANSPARENT
-            window.navigationBarColor = Color.TRANSPARENT
+            // Prozirne trake daje tema (CallkitIncomingTheme): Window.setStatusBarColor
+            // i setNavigationBarColor su zastarjeli od Androida 15 i Play ih javlja
+            // (MojiApp 09.11.2026.).
         }
     }
 
