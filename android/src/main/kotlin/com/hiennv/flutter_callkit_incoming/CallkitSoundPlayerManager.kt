@@ -92,10 +92,12 @@ class CallkitSoundPlayerManager(private val context: Context) {
         vibrator?.cancel()
     }
 
-    // MOJIAPP FORK: DND (Ne ometaj / mod Spavanje) mutira app-playani
-    // ringtone (per-uid opPlayAudio mute) bez obzira na bypassDnd kanal.
-    // Pozivi moraju zvoniti kao pravi telefon → pod DND-om zvuk/vibra idu
-    // s ALARM atributima (alarmi prolaze kroz Spavanje). Igor 2026-07-23.
+    // MOJIAPP FORK: do 12.11.2026. je pod DND-om zvono išlo kroz ALARM
+    // (glasnoća budilice) da probije „Ne ometaj". Igor 12.11.2026.: „ljudi
+    // stišaju pozive a onda im počne zvoniti mobitel jer je volume na alarmu
+    // budilice". Zvono sada UVIJEK ide kroz glasnoću zvona; „Ne ometaj"
+    // propušta poziv samo ako ga korisnik ondje dopusti (iznimke za pozive).
+    @Suppress("unused")
     private fun isDndActive(): Boolean {
         return try {
             val nm = context.getSystemService(Context.NOTIFICATION_SERVICE)
@@ -119,7 +121,7 @@ class CallkitSoundPlayerManager(private val context: Context) {
         val pattern = longArrayOf(0L, 1000L, 1000L)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            val dnd = isDndActive()
+            val dnd = false // vidi isDndActive — glasnoća zvona, ne alarma
             val audioAttrs = AudioAttributes.Builder()
                 .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
                 .setUsage(if (dnd) AudioAttributes.USAGE_ALARM
@@ -155,7 +157,7 @@ class CallkitSoundPlayerManager(private val context: Context) {
         }
         try {
             ringtone = RingtoneManager.getRingtone(context, uri)
-            val dnd = isDndActive()
+            val dnd = false // vidi isDndActive — glasnoća zvona, ne alarma
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 val attribution = AudioAttributes.Builder()
                     .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
