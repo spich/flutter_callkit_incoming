@@ -8,7 +8,6 @@
 package com.hiennv.flutter_callkit_incoming
 
 import android.app.Activity
-import android.app.KeyguardManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -387,18 +386,16 @@ class CallkitIncomingActivity : Activity() {
             TransparentActivity.getIntent(this, CallkitConstants.ACTION_CALL_ACCEPT, data)
         startActivity(acceptIntent)
 
-        dismissKeyguard()
+        // MOJIAPP FORK (12.11.2026.): BEZ dismissKeyguard() — tražio je PIN
+        // odmah nakon Javi se (izmjereno moto g, Android 15). Ekran poziva u
+        // aplikaciji ima showWhenLocked samo dok traje poziv (natrag = prekid),
+        // ostatak aplikacije ostaje iza zaključanog zaslona. Isto kao upstream
+        // 4d18de2.
         // MOJIAPP FORK: i zadatak, ne samo aktivnost — inače ostaje prazan
         // „sistemski poziv" među otvorenim aplikacijama.
         finishTask()
     }
 
-    private fun dismissKeyguard() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val keyguardManager = getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
-            keyguardManager.requestDismissKeyguard(this, null)
-        }
-    }
 
     private fun onDeclineClick() {
         // Log.d("CallkitIncomingActivity", "[CALLKIT] 📱 onDeclineClick")
