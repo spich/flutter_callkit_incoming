@@ -12,6 +12,8 @@ import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.ServiceCompat
@@ -65,6 +67,7 @@ class CallkitNotificationService : Service() {
 
         fun onIncomingCleared(isAccepted: Boolean) {
             instance?.let {
+                it.otkaziIstek()
                 if (it.foregroundIsIncoming) {
                     ServiceCompat.stopForeground(it, ServiceCompat.STOP_FOREGROUND_REMOVE)
                     it.foregroundIsIncoming = false
@@ -84,6 +87,34 @@ class CallkitNotificationService : Service() {
 
 
     private var foregroundIsIncoming = false
+
+    // MOJIAPP FORK (14.11.2026.): Android NE gasi obavijest servisa u prvom
+    // planu po setTimeoutAfter, pa zvono koje drži FGS nije imalo istek —
+    // moto g (Android 15) zvonio je dok server nije prekinuo nakon 60 s.
+    // Servis zato sam odbroji isti rok i pošalje ACTION_CALL_TIMEOUT
+    // (isti put kao deleteIntent obavijesti).
+    private val istekHandler = Handler(Looper.getMainLooper())
+    private var istekRunnable: Runnable? = null
+
+    private fun zakaziIstek(bundle: Bundle) {
+        otkaziIstek()
+        val trajanje = bundle.getLong(CallkitConstants.EXTRA_CALLKIT_DURATION, 0L)
+        if (trajanje <= 0L) return
+        val r = Runnable {
+            istekRunnable = null
+            if (foregroundIsIncoming) {
+                Log.d(TAG, "istek zvona (FGS) nakon ${trajanje} ms")
+                sendBroadcast(CallkitIncomingBroadcastReceiver.getIntentTimeout(this, bundle))
+            }
+        }
+        istekRunnable = r
+        istekHandler.postDelayed(r, trajanje)
+    }
+
+    fun otkaziIstek() {
+        istekRunnable?.let { istekHandler.removeCallbacks(it) }
+        istekRunnable = null
+    }
 
     override fun onCreate() {
         super.onCreate()
@@ -153,6 +184,7 @@ class CallkitNotificationService : Service() {
                             startForeground(incoming.id, incoming.notification)
                         }
                         foregroundIsIncoming = true
+                        bundle?.let { zakaziIstek(it) }
                     } else {
                         // startForegroundService BEZ startForeground = 
                         // ForegroundServiceDidNotStartInTimeException; dignemo
@@ -300,6 +332,7 @@ class CallkitNotificationService : Service() {
 
 
     override fun onDestroy() {
+        otkaziIstek()
         instance = null
         super.onDestroy()
         // Don't destroy the notification manager here as it's shared across the app
