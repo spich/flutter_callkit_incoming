@@ -374,14 +374,10 @@ class CallkitIncomingActivity : Activity() {
         // Log.d("CallkitIncomingActivity", "[CALLKIT] 📱 onAcceptClick")
         val data = intent.extras?.getBundle(CallkitConstants.EXTRA_CALLKIT_INCOMING_DATA)
 
-
-        CallkitNotificationService.startServiceWithAction(
-            this@CallkitIncomingActivity,
-            CallkitConstants.ACTION_CALL_ACCEPT,
-            data
-        )
-
-
+        // MOJIAPP FORK (14.11.2026.): servis ovdje NE pokrećemo — TransparentActivity
+        // šalje ACTION_CALL_ACCEPT prijemniku, a on pokreće servis (isti put kao
+        // gumb u obavijesti i javljanje sa sata). Prije se servis dizao dvaput i
+        // obavijest razgovora objavljivala dva-tri puta zaredom.
         val acceptIntent =
             TransparentActivity.getIntent(this, CallkitConstants.ACTION_CALL_ACCEPT, data)
         startActivity(acceptIntent)
